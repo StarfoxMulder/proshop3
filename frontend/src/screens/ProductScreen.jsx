@@ -1,12 +1,24 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap'
 import Rating from '../components/Rating'
-import products from '../products'
+import axios from 'axios'
  
 const ProductScreen = () => {
+  const [product, setProduct] = useState({});
+
   const { id: productId } = useParams();
-  const product = products.find((p) => p._id == productId);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const { data } = await axios.get(`/api/products/${productId}`);
+      setProduct(data);
+    }
+    
+    fetchProduct();
+  }, [productId]);
+  
 
   return (
     <>
@@ -27,11 +39,41 @@ const ProductScreen = () => {
             />
           </ListGroup.Item>
           <ListGroup.Item>
-            Price: ${product.price}
+            {product.description}
           </ListGroup.Item>
         </ListGroup>
         </Col>
         <Col md={3}>
+          <Card>
+            <ListGroup>
+              <ListGroup.Item>
+                <Row>
+                  <Col>Price:</Col>
+                  <Col>${product.price}</Col>
+                </Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Row>
+                  <Col>Status:</Col>
+                  <Col>{product.countInStock > 0 ? 'In stock' : 'Out of stock'}</Col>
+                </Row>
+              </ListGroup.Item>
+              <ListGroup.Item>
+                <Row className="justify-content-md-center">
+                  <Col md="auto">
+                    <Button 
+                      className="btn-block"
+                      type="button"
+                      disabled={product.countInStock == 0}
+                      size="lg"
+                    >
+                      Add to Cart
+                    </Button>
+                  </Col>
+                </Row>
+              </ListGroup.Item>
+            </ListGroup>
+          </Card>
         </Col>
       </Row>
     </>
