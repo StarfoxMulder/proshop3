@@ -1,16 +1,29 @@
-import React from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap'
-import Rating from '../components/Rating'
-import Loader from '../components/Loader'
-import Message from '../components/Message'
+import { useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Row, Col, Image, ListGroup, Card, Button, Form, } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import Rating from '../components/Rating';
+import Loader from '../components/Loader';
+import Message from '../components/Message';
 import { useGetProductDetailsQuery } from '../slices/productsApiSlice';
+import { addToCart } from '../slices/cartSlice';
  
 const ProductScreen = () => {
   const { id: productId } = useParams();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const [qty, setQty] = useState(1);
+
   const { data: product, isLoading, error } = useGetProductDetailsQuery(productId);
 
-console.log(error);
+  const addToCartHandler = () => {
+    dispatch(addToCart({ ...product, qty }));
+    navigate('/cart');
+  }
+
+// console.log([...Array(product.countInStock).keys()]);
 
   return (
     <>
@@ -55,6 +68,29 @@ console.log(error);
                     <Col>{product.countInStock > 0 ? 'In stock' : 'Out of stock'}</Col>
                   </Row>
                 </ListGroup.Item>
+                {/* Quantity in stock dropdown options */}
+                {product.countInStock > 0 && (
+                  <ListGroup.Item>
+                    <Row>
+                      <Col>Qty</Col>
+                      <Col>
+                        <Form.Control
+                          as='select'
+                          value={qty}
+                          onChange={(e) => {
+                            setQty(Number(e.target.value))
+                          }}
+                        >
+                          {[...Array(product.countInStock).keys()]
+                            .map((x) => (
+                              <option key={x+1} value={x+1}>{x+1}</option>
+                            ))
+                          }
+                        </Form.Control>
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                )}
                 <ListGroup.Item>
                   <Row className="justify-content-md-center">
                     <Col md="auto">
@@ -63,6 +99,7 @@ console.log(error);
                         type="button"
                         disabled={product.countInStock == 0}
                         size="lg"
+                        onClick={addToCartHandler}
                       >
                         Add to Cart
                       </Button>
