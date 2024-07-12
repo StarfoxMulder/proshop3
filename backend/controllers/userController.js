@@ -13,8 +13,8 @@ const authUser = asyncHandler( async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    // In userModel we added the custom method matchPassword which can be accessed by this user object
-
+    // In userModel we added the custom method matchPassword 
+    // which can be accessed by this user object
     generateToken(res, user._id);
 
     res.json({
@@ -23,7 +23,6 @@ const authUser = asyncHandler( async (req, res) => {
       email: user.email,
       isAdmin: user.isAdmin
     });
-
   } else {
     res.status(401);
     throw new Error('Invalid email or password');
