@@ -33,8 +33,6 @@ const LoginScreen = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    console.trace();
-    console.log(e);
     try {
       const res = await login({ email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
@@ -71,7 +69,7 @@ const LoginScreen = () => {
         <Button
           type='submit'
           variant='primary'
-          className='mt-2'
+          className='my-2'
           onClick={submitHandler}
           disabled={ isLoading }
         >
