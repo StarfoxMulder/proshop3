@@ -3,7 +3,6 @@ const addDecimals = (num) => {
 }
 
 export const updateCart = (state) => {
-  console.trace();
   // Calculate the items price in whole number (pennies) to avoid issues with
   // floating point number calculations
   const itemsPrice = state.cartItems.reduce(
