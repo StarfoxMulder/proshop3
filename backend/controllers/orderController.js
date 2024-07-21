@@ -4,15 +4,16 @@ import Order from '../models/orderModel.js';
 // @desc Create new order
 // @route POST /api/orders
 // @access Private
-const addOrderItems = asyncHandler( async (req, res) => {
+const addOrderItems = asyncHandler(async (req, res) => {
   // Destructing all of the values we need for the order sent in the http req
+
   const {
     orderItems,
     shippingAddress,
     paymentMethod,
     itemsPrice,
-    taxPrice,
     shippingPrice,
+    taxPrice,
     totalPrice
   } = req.body;
 
@@ -32,11 +33,12 @@ const addOrderItems = asyncHandler( async (req, res) => {
       shippingAddress,
       paymentMethod,
       itemsPrice,
-      taxPrice,
       shippingPrice,
+      taxPrice,
       totalPrice
     });
 
+    console.log(order);
     const createdOrder = await order.save();
 
     res.status(201).json(createdOrder);

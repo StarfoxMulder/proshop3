@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
 import CheckoutSteps from '../components/CheckoutSteps'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
@@ -11,7 +11,7 @@ import { clearCartItems } from '../slices/cartSlice'
 
 const PlaceOrderScreen = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+
   const cart = useSelector((state) => state.cart);
 
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
@@ -22,8 +22,9 @@ const PlaceOrderScreen = () => {
     } else if (!cart.paymentMethod) {
       navigate('/payment');
     }
-  }, [cart.paymentMethod, cart.shippingAddress.address, navigate])
+  }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
 
+  const dispatch = useDispatch();
   const placeOrderHandler = async () => {
     try {
       const res = await createOrder({
@@ -35,8 +36,9 @@ const PlaceOrderScreen = () => {
         taxPrice: cart.taxPrice,
         totalPrice: cart.totalPrice,
       }).unwrap();
+      console.log(res);
       dispatch(clearCartItems());
-      navigate(`/order/${res._id}`);
+      navigate(`/orders/${res._id}`);
     } catch (err) {
       toast.error(err);
     }
@@ -52,7 +54,9 @@ const PlaceOrderScreen = () => {
               <h2>Shipping</h2>
               <p>
                 <strong>Address: </strong>
-                {cart.shippingAddress.address}, {cart.shippingAddress.city} {cart.shippingAddress.postal}, {cart.shippingAddress.country}
+                {cart.shippingAddress.address}, {cart.shippingAddress.city}{' '}
+                {cart.shippingAddress.postal},{' '}
+                {cart.shippingAddress.country}
               </p>
             </ListGroup.Item>
 
@@ -80,7 +84,7 @@ const PlaceOrderScreen = () => {
                           />
                         </Col>
                         <Col>
-                          <Link to={`/product/${item.product}`}>
+                          <Link to={`/product/${item._id}`}>
                             {item.name}
                           </Link>
                         </Col>
