@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema({
       },
     },
   ],
+  // TODO: Add state field here and where it would show up in UI
   shippingAddress: {
     address: { type: String, required: true },
     city: { type: String, required: true },
