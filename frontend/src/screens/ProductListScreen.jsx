@@ -1,31 +1,56 @@
+import { useState } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Table, Button, Row, Col } from 'react-bootstrap';
-import { FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { useGetProductsQuery } from '../slices/productsApiSlice';
+import { toast } from 'react-toastify';
+import { 
+  useGetProductsQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation
+} from '../slices/productsApiSlice';
 
 const ProductListScreen = () => {
 
-  const { data: products, isLoading, error } = useGetProductsQuery();
+  const { data: products, isLoading, error, refetch } = useGetProductsQuery();
 
-  const deleteHandler = async () => {
+  const { userInfo } = useSelector((state) => state.auth)
 
+  const [createProduct, { isLoading: loadingCreate, error: errorCreate }] = useCreateProductMutation();
+
+  const deleteHandler = async (id) => {
+    console.log('delete', id)
   }
-  
+
+  const dispatch = useDispatch();
+  const createProductHandler = async () => {
+    if(window.confirm('Are you sure you want to create a new product?')) {
+      try {
+        await createProduct();
+        refetch();
+      } catch (err) {
+        toast.error(err?.data?.message || err?.error)
+      }
+    }
+  }
+
   return <>
     <Row className="align-items-center">
       <Col>
         <h1>Products</h1>
       </Col>
       <Col className='text-end'>
-        <Button className='btn-sm m-3'>
+        <Button className='btn-sm m-3' onClick={ createProductHandler }>
           <FaEdit /> Create Product
         </Button>
       </Col>
     </Row>
 
-    { isLoading ? <Loader />
+    { loadingCreate && <Loader /> }
+
+    { isLoading ? ( <Loader /> )
       : error ? <Message variant='danger'>{error}</Message>
       : (
       <>
@@ -45,7 +70,7 @@ const ProductListScreen = () => {
               <tr key={product._id}>
                 <td>{product._id}</td>
                 <td>{product.name}</td>
-                <td>{product.price}</td>
+                <td>${product.price.toFixed(2)}</td>
                 <td>{product.category}</td>
                 <td>{product.brand}</td>
                 <td>
@@ -62,7 +87,7 @@ const ProductListScreen = () => {
                     className='btn-sm'
                     onClick={ () => deleteHandler(product._id) }
                   >
-                    <FaTrash/>
+                    <FaTrash style={{ color: 'white' }} />
                   </Button>
                 </td>
               </tr>
