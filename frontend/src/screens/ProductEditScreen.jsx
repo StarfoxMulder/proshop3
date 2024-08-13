@@ -39,6 +39,29 @@ const ProductEditScreen = () => {
     }
   }, [product]);
 
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    const updatedProduct = {
+      productId,
+      name,
+      price,
+      image,
+      brand,
+      category,
+      countInStock,
+      description
+    };
+
+    const result = await updateProduct(updatedProduct);
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      toast.success('Product updated');
+      navigate('/admin/productlist');
+    }
+  }
+
+
   return <>
     <Link to='/admin/productList' className='btn btn-light my-3'>
       <FaArrowLeft /> Go Back
@@ -49,7 +72,7 @@ const ProductEditScreen = () => {
       { isLoading ? <Loader />
         : error ? <Message variant='danger'>{error}</Message>
         : (
-          <Form>
+          <Form onSubmit={submitHandler}>
             <Form.Group controlId='name' className='my-2'>
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -98,6 +121,22 @@ const ProductEditScreen = () => {
                 onChange={(e) => setCountInStock(e.target.value)}
               ></Form.Control>
             </Form.Group>
+            <Form.Group controlId='description' className='my-2'>
+              <Form.Label>Count in Stock</Form.Label>
+              <Form.Control
+                type='text'
+                placeholder='Enter count in stock'
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              ></Form.Control>
+            </Form.Group>
+
+            <Button
+              type='submit'
+              variant='primary'
+              className='my-2'
+            >Update</Button>
+
           </Form>
         )
       }
