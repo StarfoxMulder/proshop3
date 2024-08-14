@@ -1,7 +1,7 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Table, Button, Row, Col } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+// import { useDispatch, useSelector } from 'react-redux';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
@@ -9,26 +9,36 @@ import { toast } from 'react-toastify';
 import { 
   useGetProductsQuery,
   useCreateProductMutation,
-  useUpdateProductMutation
+  useDeleteProductMutation
 } from '../slices/productsApiSlice';
 
 const ProductListScreen = () => {
 
   const { data: products, isLoading, error, refetch } = useGetProductsQuery();
 
-  const { userInfo } = useSelector((state) => state.auth)
+  // const { userInfo } = useSelector((state) => state.auth)
+  // const dispatch = useDispatch();
 
   const [createProduct, { isLoading: loadingCreate, error: errorCreate }] = useCreateProductMutation();
 
+  const [deleteProduct, { isLoading: loadingDelete}] = useDeleteProductMutation();
+
   const deleteHandler = async (id) => {
-    console.log('delete', id)
+    if (window.confirm('Are you sue you want to delete this product?')) {
+      try {
+        await deleteProduct(id);
+        refetch();
+      } catch (err) {
+        toast.error(err?.data?.message || err?.error)
+      }
+    }
   }
 
-  const dispatch = useDispatch();
   const createProductHandler = async () => {
     if(window.confirm('Are you sure you want to create a new product?')) {
       try {
         await createProduct();
+        toast.success('Product deleted');
         refetch();
       } catch (err) {
         toast.error(err?.data?.message || err?.error)
@@ -49,6 +59,7 @@ const ProductListScreen = () => {
     </Row>
 
     { loadingCreate && <Loader /> }
+    { loadingDelete && <Loader />}
 
     { isLoading ? ( <Loader /> )
       : error ? <Message variant='danger'>{error}</Message>
